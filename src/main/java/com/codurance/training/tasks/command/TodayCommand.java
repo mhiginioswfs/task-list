@@ -11,11 +11,6 @@ import java.util.Map;
 
 public class TodayCommand extends ShowCommand {
 
-
-    public TodayCommand(PrintWriter out) {
-        super(out);
-    }
-
     @Override
     public boolean appliesTo(String commandLine) {
         return commandLine.startsWith("today");
@@ -24,9 +19,5 @@ public class TodayCommand extends ShowCommand {
     @Override
     protected Tasks filterTasks(Tasks tasks) {
         return tasks.refineTasks(Task::endsNow);
-    }
-
-    private boolean isEquals(LocalDate now, Task task) {
-        return task.getDeadline() != null && task.getDeadline().equals(now);
     }
 }

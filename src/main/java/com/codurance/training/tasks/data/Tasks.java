@@ -25,9 +25,16 @@ public class Tasks {
     }
 
     public Task getTaskById(String id) {
-        Optional<Task> result =
-                tasks.values().stream().flatMap(List::stream).filter(task -> task.getId().equals(id)).findFirst();
+        Optional<Task> result = findTask(id);
         return result.orElseThrow(() -> new NoSuchElementException("Task " + id + " not found"));
+    }
+
+    public boolean existTask(String id) {
+        return findTask(id).isPresent();
+    }
+
+    private Optional<Task> findTask(String id) {
+        return tasks.values().stream().flatMap(List::stream).filter(task -> task.getId().equals(id)).findFirst();
     }
 
     public String nextId() {

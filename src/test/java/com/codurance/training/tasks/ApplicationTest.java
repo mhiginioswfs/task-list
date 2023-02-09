@@ -3,8 +3,8 @@ package com.codurance.training.tasks;
 import static java.lang.System.lineSeparator;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,9 +14,10 @@ import java.io.PipedOutputStream;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public final class ApplicationTest {
     public static final String PROMPT = "> ";
@@ -36,15 +37,13 @@ public final class ApplicationTest {
         applicationThread = new Thread(taskList);
     }
 
-    @Before
-    public void
-    start_the_application() {
+    @BeforeEach
+    public void start_the_application() {
         applicationThread.start();
     }
 
-    @After
-    public void
-    kill_the_application() throws IOException, InterruptedException {
+    @AfterEach
+    public void kill_the_application() throws InterruptedException {
         if (!stillRunning()) {
             return;
         }
@@ -58,7 +57,7 @@ public final class ApplicationTest {
         throw new IllegalStateException("The application is still running.");
     }
 
-    @Test(timeout = 10000)
+    @Test
     public void it_works() throws IOException {
         execute("show");
 
@@ -106,7 +105,7 @@ public final class ApplicationTest {
         execute("quit");
     }
 
-    @Test(timeout = 10000)
+    @Test
     public void when_deadline_command_is_called_task_should_be_updated() throws IOException {
         execute("add project secrets");
         execute("add task secrets Eat more donuts.");
@@ -118,7 +117,7 @@ public final class ApplicationTest {
         assertEquals(LocalDate.of(2023, 10, 10), taskList.getTasks().getTaskById("1").getDeadline());
     }
 
-    @Test(timeout = 10000)
+    @Test
     public void when_task_doesnt_exist_deadline_command_should_throw_an_error() throws Exception {
 
         execute("add project secrets");
@@ -139,7 +138,7 @@ public final class ApplicationTest {
         execute("add task empty Empty task");
         execute("add project training");
         execute("add task training Four Elements of Simple Design");
-        execute("add task training SOLID");
+        execute("add namedTask training SOLID SOLID");
         execute("add task training Coupling and Cohesion");
         execute("add task training Primitive Obsession");
         execute("add task training Outside-In TDD");
@@ -152,7 +151,7 @@ public final class ApplicationTest {
         execute("deadline 3 2000-01-01");
         execute("deadline 5 " + future);
         execute("deadline 6 " + now);
-        execute("deadline 9 " + now);
+        execute("deadline SOLID " + now);
 
         execute("check 1");
         execute("check 6");
@@ -164,8 +163,9 @@ public final class ApplicationTest {
                 "    [x] 1: Eat more donuts.",
                 "",
                 "training",
-                "    [x] 6: Coupling and Cohesion",
-                "    [ ] 9: Interaction-Driven Design",
+                "    [ ] SOLID: SOLID",
+                "    [x] 6: Primitive Obsession",
+
                 ""
         );
 

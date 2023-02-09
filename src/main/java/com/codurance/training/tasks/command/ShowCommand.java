@@ -8,11 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ShowCommand implements Command {
-    private final PrintWriter out;
-
-    public ShowCommand(PrintWriter out) {
-        this.out = out;
-    }
 
     @Override
     public boolean appliesTo(String commandLine) {

@@ -33,13 +33,7 @@ public class LegacyCommand implements Command {
 
     private void add(String[] commandLine, Tasks tasks) {
         String[] subcommandRest = commandLine[1].split(" ", 2);
-        String subcommand = subcommandRest[0];
-        if (subcommand.equals("project")) {
-            tasks.addProject(subcommandRest[1]);
-        } else if (subcommand.equals("task")) {
-            String[] projectTask = subcommandRest[1].split(" ", 2);
-            addTask(projectTask[0], projectTask[1], tasks);
-        }
+        tasks.addProject(subcommandRest[1]);
     }
 
     private void check(String taskId, Tasks tasks) {
@@ -50,23 +44,18 @@ public class LegacyCommand implements Command {
         tasks.setDone(taskId, false);
     }
 
-    private void addTask(String project, String description, Tasks tasks) {
-        List<Task> projectTasks = tasks.getProject(project);
-        if (projectTasks == null) {
-            out.printf("Could not find a project with the name \"%s\".", project);
-            out.println();
-            return;
-        }
-        projectTasks.add(new Task(tasks.nextId(), description, false));
-    }
+
 
     private void help() {
+        // FIXME task implementations could return their own help info.
         out.println("Commands:");
         out.println("  show");
         out.println("  add project <project name>");
         out.println("  add task <project name> <task description>");
+        out.println("  add namedTask <project name> <task id> <task description>");
         out.println("  check <task ID>");
         out.println("  uncheck <task ID>");
+        out.println("  deadline <task ID> <date>");
         out.println();
     }
 

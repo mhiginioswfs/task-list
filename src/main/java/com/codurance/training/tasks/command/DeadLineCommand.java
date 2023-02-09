@@ -2,15 +2,9 @@ package com.codurance.training.tasks.command;
 
 import com.codurance.training.tasks.data.Task;
 import com.codurance.training.tasks.data.Tasks;
-import java.io.PrintWriter;
 import java.time.LocalDate;
 
 public class DeadLineCommand implements Command {
-    private final PrintWriter out;
-
-    public DeadLineCommand(PrintWriter out) {
-        this.out = out;
-    }
 
     @Override
     public boolean appliesTo(String commandLine) {

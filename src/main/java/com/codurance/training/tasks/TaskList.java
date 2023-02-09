@@ -1,5 +1,7 @@
 package com.codurance.training.tasks;
 
+import com.codurance.training.tasks.command.AddNamedTaskCommand;
+import com.codurance.training.tasks.command.AddTaskCommand;
 import com.codurance.training.tasks.command.Command;
 import com.codurance.training.tasks.command.DeadLineCommand;
 import com.codurance.training.tasks.command.LegacyCommand;
@@ -27,9 +29,11 @@ public final class TaskList implements Runnable {
     public TaskList(BufferedReader reader, PrintWriter writer) {
         this.in = reader;
         this.out = writer;
-        commands = List.of(new DeadLineCommand(out),
-                new ShowCommand(out),
-                new TodayCommand(out),
+        commands = List.of(new DeadLineCommand(),
+                new ShowCommand(),
+                new TodayCommand(),
+                new AddTaskCommand(out),
+                new AddNamedTaskCommand(out),
                 new LegacyCommand(out));
         tasks = new Tasks(out);
     }
