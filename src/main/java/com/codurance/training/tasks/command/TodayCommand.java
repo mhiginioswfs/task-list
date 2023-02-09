@@ -1,7 +1,8 @@
 package com.codurance.training.tasks.command;
 
-import com.codurance.training.tasks.Task;
+import com.codurance.training.tasks.data.Task;
 import com.codurance.training.tasks.TaskList;
+import com.codurance.training.tasks.data.Tasks;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
@@ -21,16 +22,8 @@ public class TodayCommand extends ShowCommand {
     }
 
     @Override
-    protected Map<String, List<Task>> filterTasks(TaskList taskList) {
-        Map<String, List<Task>> result = new LinkedHashMap<>();
-        LocalDate now = LocalDate.now();
-        for (Map.Entry<String, List<Task>> entry : taskList.getTasks().entrySet()) {
-            List<Task> todayTasks = entry.getValue().stream().filter(task -> isEquals(now, task)).toList();
-            if (!todayTasks.isEmpty()) {
-                result.put(entry.getKey(), todayTasks);
-            }
-        }
-        return result;
+    protected Tasks filterTasks(Tasks tasks) {
+        return tasks.refineTasks(Task::endsNow);
     }
 
     private boolean isEquals(LocalDate now, Task task) {

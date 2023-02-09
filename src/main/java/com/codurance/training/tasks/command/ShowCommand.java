@@ -1,7 +1,8 @@
 package com.codurance.training.tasks.command;
 
-import com.codurance.training.tasks.Task;
+import com.codurance.training.tasks.data.Task;
 import com.codurance.training.tasks.TaskList;
+import com.codurance.training.tasks.data.Tasks;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
@@ -19,22 +20,12 @@ public class ShowCommand implements Command {
     }
 
     @Override
-    public final void execute(String commandLine, TaskList taskList) {
-        show(filterTasks(taskList));
-        
+    public final void execute(String commandLine, Tasks tasks) {
+        filterTasks(tasks).show();
     }
 
-    protected Map<String, List<Task>> filterTasks(TaskList taskList) {
-        return taskList.getTasks();
+    protected Tasks filterTasks(Tasks tasks) {
+        return tasks;
     }
 
-    private void show(Map<String, List<Task>> tasks) {
-        for (Map.Entry<String, List<Task>> project : tasks.entrySet()) {
-            out.println(project.getKey());
-            for (Task task : project.getValue()) {
-                out.printf("    [%c] %d: %s%n", (task.isDone() ? 'x' : ' '), task.getId(), task.getDescription());
-            }
-            out.println();
-        }
-    }
 }

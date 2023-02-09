@@ -5,25 +5,21 @@ import com.codurance.training.tasks.command.DeadLineCommand;
 import com.codurance.training.tasks.command.LegacyCommand;
 import com.codurance.training.tasks.command.ShowCommand;
 import com.codurance.training.tasks.command.TodayCommand;
+import com.codurance.training.tasks.data.Tasks;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public final class TaskList implements Runnable {
     private static final String QUIT = "quit";
     private final List<Command> commands;
 
-    private final Map<String, List<Task>> tasks = new LinkedHashMap<>();
+    private final Tasks tasks;
     private final BufferedReader in;
     private final PrintWriter out;
-
-    private long lastId = 0;
 
     private Exception error;
 
@@ -35,6 +31,7 @@ public final class TaskList implements Runnable {
                 new ShowCommand(out),
                 new TodayCommand(out),
                 new LegacyCommand(out));
+        tasks = new Tasks(out);
     }
 
     public void run() {
@@ -61,11 +58,7 @@ public final class TaskList implements Runnable {
 
     private void execute(String commandLine) {
         Command command = findCommand(commandLine);
-        command.execute(commandLine, this);
-    }
-
-    public long nextId() {
-        return ++lastId;
+        command.execute(commandLine, tasks);
     }
 
     private Command findCommand(String commandLine) {
@@ -73,17 +66,12 @@ public final class TaskList implements Runnable {
         return result.orElseThrow();
     }
 
-    public Map<String, List<Task>> getTasks() {
+    public Tasks getTasks() {
         return tasks;
     }
 
     public Exception getError() {
         return error;
-    }
-
-    public Task getTaskById(Long id) {
-        Optional<Task> result = tasks.values().stream().flatMap(List::stream).filter(task -> task.getId() == id).findFirst();
-        return result.orElseThrow(() -> new NoSuchElementException("Task " + id + " not found"));
     }
 
     public static void main(String[] args) {

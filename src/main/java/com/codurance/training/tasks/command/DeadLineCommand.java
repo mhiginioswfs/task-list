@@ -1,7 +1,7 @@
 package com.codurance.training.tasks.command;
 
-import com.codurance.training.tasks.Task;
-import com.codurance.training.tasks.TaskList;
+import com.codurance.training.tasks.data.Task;
+import com.codurance.training.tasks.data.Tasks;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 
@@ -18,23 +18,23 @@ public class DeadLineCommand implements Command {
     }
 
     @Override
-    public void execute(String commandLine, TaskList taskList) {
+    public void execute(String commandLine, Tasks tasks) {
         CommandData data = parse(commandLine);
-        Task task = taskList.getTaskById(data.id);
+        Task task = tasks.getTaskById(data.taskId);
         task.setDeadline(data.deadline);
     }
 
     private CommandData parse(String commandLine) {
         String[] split = commandLine.split(" ");
-        return new CommandData(Long.parseLong(split[1]), LocalDate.parse(split[2]));
+        return new CommandData(split[1], LocalDate.parse(split[2]));
     }
 
     private static class CommandData {
-        private final Long id;
+        private final String taskId;
         private final LocalDate deadline;
 
-        private CommandData(Long id, LocalDate date) {
-            this.id = id;
+        private CommandData(String taskId, LocalDate date) {
+            this.taskId = taskId;
             this.deadline = date;
         }
     }

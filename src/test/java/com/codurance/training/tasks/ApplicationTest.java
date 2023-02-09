@@ -115,7 +115,7 @@ public final class ApplicationTest {
 
         execute("quit");
 
-        assertEquals(LocalDate.of(2023, 10, 10), taskList.getTaskById(1l).getDeadline());
+        assertEquals(LocalDate.of(2023, 10, 10), taskList.getTasks().getTaskById("1").getDeadline());
     }
 
     @Test(timeout = 10000)
