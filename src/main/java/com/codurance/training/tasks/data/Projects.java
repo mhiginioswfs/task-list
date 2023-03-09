@@ -75,17 +75,11 @@ public class Projects {
     }
 
     public void setDone(String taskId, boolean done) {
-        for (Map.Entry<String, Project> project : projectMap.entrySet()) {
-            for (Task task : project.getValue().getTasks()) {
-                if (task.getId().equals(taskId)) {
-                    task.setDone(done);
-                    return;
-                }
-            }
-        }
-        Outputter out = Outputter.getInstance();
-        out.printf("Could not find a task with an ID of %s.", taskId);
-        out.println();
+        findTask(taskId).ifPresentOrElse(task -> task.setDone(done), () -> {
+            Outputter out = Outputter.getInstance();
+            out.printf("Could not find a task with an ID of %s.", taskId);
+            out.println();
+        });
     }
 
     public void removeTask(String id) {
