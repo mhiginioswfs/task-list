@@ -1,7 +1,6 @@
 package com.codurance.training.tasks.data;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,7 @@ import java.util.function.Predicate;
 
 public class Projects {
 
-    private final Map<String, List<Task>> tasks;
+    private final Map<String, Project> projectMap;
     private final PrintWriter out;
     private long lastId = 0;
 
@@ -19,8 +18,8 @@ public class Projects {
         this(out, new LinkedHashMap<>());
     }
 
-    public Projects(PrintWriter out, Map<String, List<Task>> tasks) {
-        this.tasks = tasks;
+    public Projects(PrintWriter out, Map<String, Project> projectMap) {
+        this.projectMap = projectMap;
         this.out = out;
     }
 
@@ -34,7 +33,11 @@ public class Projects {
     }
 
     private Optional<Task> findTask(String id) {
-        return tasks.values().stream().flatMap(List::stream).filter(task -> task.getId().equals(id)).findFirst();
+        return projectMap.values()
+                .stream()
+                .flatMap(k -> k.getTasks().stream())
+                .filter(task -> task.getId().equals(id))
+                .findFirst();
     }
 
     public String nextId() {
@@ -42,28 +45,28 @@ public class Projects {
     }
 
     public void addProject(String projectName) {
-        tasks.put(projectName, new ArrayList<>());
+        projectMap.put(projectName, new Project());
     }
 
     public Projects refineTasks(Predicate<Task> predicate) {
-        Map<String, List<Task>> result = new LinkedHashMap<>();
-        for (Map.Entry<String, List<Task>> entry : tasks.entrySet()) {
-            List<Task> todayTasks = entry.getValue().stream().filter(predicate).toList();
+        Map<String, Project> result = new LinkedHashMap<>();
+        for (Map.Entry<String, Project> entry : projectMap.entrySet()) {
+            List<Task> todayTasks = entry.getValue().getTasks().stream().filter(predicate).toList();
             if (!todayTasks.isEmpty()) {
-                result.put(entry.getKey(), todayTasks);
+                result.put(entry.getKey(), new Project(todayTasks));
             }
         }
         return new Projects(out, result);
     }
 
-    public List<Task> getProject(String project) {
-        return tasks.get(project);
+    public Project getProject(String project) {
+        return projectMap.get(project);
     }
 
     public void show() {
-        for (Map.Entry<String, List<Task>> project : tasks.entrySet()) {
+        for (Map.Entry<String, Project> project : projectMap.entrySet()) {
             out.println(project.getKey());
-            for (Task task : project.getValue()) {
+            for (Task task : project.getValue().getTasks()) {
                 out.printf("    [%c] %s: %s%n", (task.isDone() ? 'x' : ' '), task.getId(), task.getDescription());
             }
             out.println();
@@ -71,8 +74,8 @@ public class Projects {
     }
 
     public void setDone(String taskId, boolean done) {
-        for (Map.Entry<String, List<Task>> project : tasks.entrySet()) {
-            for (Task task : project.getValue()) {
+        for (Map.Entry<String, Project> project : projectMap.entrySet()) {
+            for (Task task : project.getValue().getTasks()) {
                 if (task.getId().equals(taskId)) {
                     task.setDone(done);
                     return;

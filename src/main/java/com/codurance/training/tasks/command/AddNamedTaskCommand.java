@@ -25,7 +25,7 @@ public class AddNamedTaskCommand implements Command {
     }
 
     private void add(Command command, Projects projects) {
-        List<Task> projectTasks = projects.getProject(command.projectName);
+        List<Task> projectTasks = projects.getProject(command.projectName).getTasks();
         if (projectTasks == null) {
             out.printf("Could not find a project with the name \"%s\".", command.projectName);
             out.println();

@@ -41,7 +41,7 @@ public class AddNamedTaskCommandTest {
         projects.addProject("myProject");
         task.execute("add namedTask myProject myTask bla bla bla", projects);
 
-        List<Task> projectTasks = projects.getProject("myProject");
+        List<Task> projectTasks = projects.getProject("myProject").getTasks();
         assertNotNull(projectTasks);
         assertEquals(1, projectTasks.size());
         assertEquals("bla bla bla", projectTasks.get(0).getDescription());
@@ -57,7 +57,7 @@ public class AddNamedTaskCommandTest {
 
         task.execute("add namedTask myProject myTask Add my task again", projects);
 
-        List<Task> projectTasks = projects.getProject("myProject");
+        List<Task> projectTasks = projects.getProject("myProject").getTasks();
         assertNotNull(projectTasks);
         assertEquals(1, projectTasks.size());
         assertEquals("bla bla bla", projectTasks.get(0).getDescription());
@@ -74,7 +74,7 @@ public class AddNamedTaskCommandTest {
         projects.addProject("myProject");
         task.execute("add namedTask myProject 123 bla bla bla", projects);
 
-        assertEquals(0, projects.getProject("myProject").size());
+        assertEquals(0, projects.getProject("myProject").getTasks().size());
 
         verify(out).printf("Task name can't be a number or contain special characters.");
         verify(out).println();
@@ -87,7 +87,7 @@ public class AddNamedTaskCommandTest {
         projects.addProject("myProject");
         task.execute("add namedTask myProject a.a bla bla bla", projects);
 
-        assertEquals(0, projects.getProject("myProject").size());
+        assertEquals(0, projects.getProject("myProject").getTasks().size());
 
         verify(out).printf("Task name can't be a number or contain special characters.");
         verify(out).println();
