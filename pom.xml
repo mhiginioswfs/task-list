@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.codurance.training</groupId>
-    <artifactId>tasks</artifactId>
+    <artifactId>projects</artifactId>
     <version>0.1</version>
 
     <name>Task List</name>

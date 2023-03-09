@@ -9,17 +9,17 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class Tasks {
+public class Projects {
 
     private final Map<String, List<Task>> tasks;
     private final PrintWriter out;
     private long lastId = 0;
 
-    public Tasks(PrintWriter out) {
+    public Projects(PrintWriter out) {
         this(out, new LinkedHashMap<>());
     }
 
-    public Tasks(PrintWriter out, Map<String, List<Task>> tasks) {
+    public Projects(PrintWriter out, Map<String, List<Task>> tasks) {
         this.tasks = tasks;
         this.out = out;
     }
@@ -45,7 +45,7 @@ public class Tasks {
         tasks.put(projectName, new ArrayList<>());
     }
 
-    public Tasks refineTasks(Predicate<Task> predicate) {
+    public Projects refineTasks(Predicate<Task> predicate) {
         Map<String, List<Task>> result = new LinkedHashMap<>();
         for (Map.Entry<String, List<Task>> entry : tasks.entrySet()) {
             List<Task> todayTasks = entry.getValue().stream().filter(predicate).toList();
@@ -53,7 +53,7 @@ public class Tasks {
                 result.put(entry.getKey(), todayTasks);
             }
         }
-        return new Tasks(out, result);
+        return new Projects(out, result);
     }
 
     public List<Task> getProject(String project) {

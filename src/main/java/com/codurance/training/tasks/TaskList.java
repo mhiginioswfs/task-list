@@ -7,7 +7,7 @@ import com.codurance.training.tasks.command.DeadLineCommand;
 import com.codurance.training.tasks.command.LegacyCommand;
 import com.codurance.training.tasks.command.ShowCommand;
 import com.codurance.training.tasks.command.TodayCommand;
-import com.codurance.training.tasks.data.Tasks;
+import com.codurance.training.tasks.data.Projects;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,7 +19,7 @@ public final class TaskList implements Runnable {
     private static final String QUIT = "quit";
     private final List<Command> commands;
 
-    private final Tasks tasks;
+    private final Projects projects;
     private final BufferedReader in;
     private final PrintWriter out;
 
@@ -35,7 +35,7 @@ public final class TaskList implements Runnable {
                 new AddTaskCommand(out),
                 new AddNamedTaskCommand(out),
                 new LegacyCommand(out));
-        tasks = new Tasks(out);
+        projects = new Projects(out);
     }
 
     public void run() {
@@ -62,7 +62,7 @@ public final class TaskList implements Runnable {
 
     private void execute(String commandLine) {
         Command command = findCommand(commandLine);
-        command.execute(commandLine, tasks);
+        command.execute(commandLine, projects);
     }
 
     private Command findCommand(String commandLine) {
@@ -70,8 +70,8 @@ public final class TaskList implements Runnable {
         return result.orElseThrow();
     }
 
-    public Tasks getTasks() {
-        return tasks;
+    public Projects getTasks() {
+        return projects;
     }
 
     public Exception getError() {

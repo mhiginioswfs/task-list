@@ -1,7 +1,7 @@
 package com.codurance.training.tasks.command;
 
 import com.codurance.training.tasks.data.Task;
-import com.codurance.training.tasks.data.Tasks;
+import com.codurance.training.tasks.data.Projects;
 import java.time.LocalDate;
 
 public class DeadLineCommand implements Command {
@@ -12,9 +12,9 @@ public class DeadLineCommand implements Command {
     }
 
     @Override
-    public void execute(String commandLine, Tasks tasks) {
+    public void execute(String commandLine, Projects projects) {
         CommandData data = parse(commandLine);
-        Task task = tasks.getTaskById(data.taskId);
+        Task task = projects.getTaskById(data.taskId);
         task.setDeadline(data.deadline);
     }
 
