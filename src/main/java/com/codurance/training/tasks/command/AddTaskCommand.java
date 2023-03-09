@@ -2,16 +2,11 @@ package com.codurance.training.tasks.command;
 
 import com.codurance.training.tasks.data.Task;
 import com.codurance.training.tasks.data.Projects;
+import com.codurance.training.tasks.output.Outputter;
 import java.io.PrintWriter;
 import java.util.List;
 
 public class AddTaskCommand implements Command {
-
-    private final PrintWriter out;
-
-    public AddTaskCommand(PrintWriter out) {
-        this.out = out;
-    }
 
     @Override
     public boolean appliesTo(String commandLine) {
@@ -26,6 +21,8 @@ public class AddTaskCommand implements Command {
     private void addTask(Command command, Projects projects) {
         List<Task> projectTasks = projects.getProject(command.projectName).getTasks();
         if (projectTasks == null) {
+
+            Outputter out = Outputter.getInstance();
             out.printf("Could not find a project with the name \"%s\".", command.projectName);
             out.println();
             return;

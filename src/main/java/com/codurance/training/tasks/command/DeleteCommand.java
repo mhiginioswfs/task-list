@@ -12,12 +12,7 @@ public class DeleteCommand implements Command {
     @Override
     public final void execute(String commandLine, Projects projects) {
         Command deleteCommand = Command.parse(commandLine);
-
-        projects.show();
-    }
-
-    protected Projects filterTasks(Projects projects) {
-        return projects;
+        projects.removeTask(deleteCommand.id);
     }
 
     private static class Command {

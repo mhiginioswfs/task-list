@@ -1,17 +1,13 @@
 package com.codurance.training.tasks.command;
 
+import com.codurance.training.tasks.data.Project;
 import com.codurance.training.tasks.data.Projects;
 import com.codurance.training.tasks.data.Task;
+import com.codurance.training.tasks.output.Outputter;
 import java.io.PrintWriter;
 import java.util.List;
 
 public class AddNamedTaskCommand implements Command {
-
-    private final PrintWriter out;
-
-    public AddNamedTaskCommand(PrintWriter out) {
-        this.out = out;
-    }
 
     @Override
     public boolean appliesTo(String commandLine) {
@@ -25,8 +21,9 @@ public class AddNamedTaskCommand implements Command {
     }
 
     private void add(Command command, Projects projects) {
-        List<Task> projectTasks = projects.getProject(command.projectName).getTasks();
-        if (projectTasks == null) {
+        Project project = projects.getProject(command.projectName);
+        Outputter out = Outputter.getInstance();
+        if (project == null) {
             out.printf("Could not find a project with the name \"%s\".", command.projectName);
             out.println();
             return;
@@ -36,6 +33,7 @@ public class AddNamedTaskCommand implements Command {
             out.println();
             return;
         }
+        List<Task> projectTasks = project.getTasks();
         addTaskToProjectTasks(command, projects, projectTasks);
 
     }
@@ -56,6 +54,7 @@ public class AddNamedTaskCommand implements Command {
         if (!projects.existTask(command.taskId)) {
             projectTasks.add(new Task(command.taskId, command.taskDescription, false));
         } else {
+            Outputter out = Outputter.getInstance();
             out.printf("Task \"%s\" already exists.", command.taskId);
             out.println();
         }

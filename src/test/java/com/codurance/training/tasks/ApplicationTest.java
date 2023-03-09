@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.codurance.training.tasks.output.Outputter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,11 +16,11 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public final class ApplicationTest {
+
     public static final String PROMPT = "> ";
     private final PipedOutputStream inStream = new PipedOutputStream();
     private final PrintWriter inWriter = new PrintWriter(inStream, true);
@@ -28,13 +29,14 @@ public final class ApplicationTest {
     private final BufferedReader outReader = new BufferedReader(new InputStreamReader(outStream));
 
     private final Thread applicationThread;
-    private TaskList taskList;
+    private final TaskList taskList;
 
     public ApplicationTest() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(new PipedInputStream(inStream)));
-        PrintWriter out = new PrintWriter(new PipedOutputStream(outStream), true);
-        taskList = new TaskList(in, out);
+        taskList = new TaskList(in);
         applicationThread = new Thread(taskList);
+        PrintWriter out = new PrintWriter(new PipedOutputStream(outStream), true);
+        Outputter.getInstance().setPrintWriter(out);
     }
 
     @BeforeEach
@@ -70,8 +72,7 @@ public final class ApplicationTest {
                 "secrets",
                 "    [ ] 1: Eat more donuts.",
                 "    [ ] 2: Destroy all humans.",
-                ""
-        );
+                "");
 
         execute("add project training");
         execute("add task training Four Elements of Simple Design");
@@ -99,8 +100,7 @@ public final class ApplicationTest {
                 "    [x] 6: Primitive Obsession",
                 "    [ ] 7: Outside-In TDD",
                 "    [ ] 8: Interaction-Driven Design",
-                ""
-        );
+                "");
 
         execute("quit");
     }
@@ -119,7 +119,6 @@ public final class ApplicationTest {
 
     @Test
     public void when_task_doesnt_exist_deadline_command_should_throw_an_error() throws Exception {
-
         execute("add project secrets");
         execute("add task secrets Eat more donuts.");
         execute("deadline 3 2023-10-10");
@@ -130,7 +129,37 @@ public final class ApplicationTest {
     }
 
     @Test
-    public void today_command_should_show_all_tasks_due_today() throws Exception{
+    public void delete_task_should_remove_the_task() throws Exception {
+        execute("add project secrets");
+        execute("add task secrets Eat more donuts.");
+        execute("add task secrets Very important task.");
+        execute("delete 1");
+
+        execute("show");
+        readLines(
+                "secrets",
+                "    [ ] 2: Very important task.",
+                "");
+        execute("quit");
+    }
+
+    @Test
+    public void delete_task_should_remove_named_tasks() throws Exception {
+        execute("add project secrets");
+        execute("add task secrets Eat more donuts.");
+        execute("add namedTask secrets very Very important task.");
+        execute("delete very");
+
+        execute("show");
+        readLines(
+                "secrets",
+                "    [ ] 1: Eat more donuts.",
+                "");
+        execute("quit");
+    }
+
+    @Test
+    public void today_command_should_show_all_tasks_due_today() throws Exception {
         execute("add project secrets");
         execute("add task secrets Eat more donuts.");
         execute("add task secrets Destroy all humans.");
@@ -166,8 +195,7 @@ public final class ApplicationTest {
                 "    [ ] SOLID: SOLID",
                 "    [x] 6: Primitive Obsession",
 
-                ""
-        );
+                "");
 
         execute("quit");
     }

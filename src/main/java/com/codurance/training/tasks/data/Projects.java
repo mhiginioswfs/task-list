@@ -1,6 +1,6 @@
 package com.codurance.training.tasks.data;
 
-import java.io.PrintWriter;
+import com.codurance.training.tasks.output.Outputter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,16 +11,14 @@ import java.util.function.Predicate;
 public class Projects {
 
     private final Map<String, Project> projectMap;
-    private final PrintWriter out;
     private long lastId = 0;
 
-    public Projects(PrintWriter out) {
-        this(out, new LinkedHashMap<>());
+    public Projects() {
+        this(new LinkedHashMap<>());
     }
 
-    public Projects(PrintWriter out, Map<String, Project> projectMap) {
+    public Projects(Map<String, Project> projectMap) {
         this.projectMap = projectMap;
-        this.out = out;
     }
 
     public Task getTaskById(String id) {
@@ -35,8 +33,9 @@ public class Projects {
     private Optional<Task> findTask(String id) {
         return projectMap.values()
                 .stream()
-                .flatMap(k -> k.getTasks().stream())
-                .filter(task -> task.getId().equals(id))
+                .map(project -> project.findTask(id))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .findFirst();
     }
 
@@ -51,12 +50,13 @@ public class Projects {
     public Projects refineTasks(Predicate<Task> predicate) {
         Map<String, Project> result = new LinkedHashMap<>();
         for (Map.Entry<String, Project> entry : projectMap.entrySet()) {
-            List<Task> todayTasks = entry.getValue().getTasks().stream().filter(predicate).toList();
+            Project project = entry.getValue();
+            List<Task> todayTasks = project.refine(predicate);
             if (!todayTasks.isEmpty()) {
                 result.put(entry.getKey(), new Project(todayTasks));
             }
         }
-        return new Projects(out, result);
+        return new Projects(result);
     }
 
     public Project getProject(String project) {
@@ -64,6 +64,7 @@ public class Projects {
     }
 
     public void show() {
+        Outputter out = Outputter.getInstance();
         for (Map.Entry<String, Project> project : projectMap.entrySet()) {
             out.println(project.getKey());
             for (Task task : project.getValue().getTasks()) {
@@ -82,7 +83,16 @@ public class Projects {
                 }
             }
         }
+        Outputter out = Outputter.getInstance();
         out.printf("Could not find a task with an ID of %s.", taskId);
         out.println();
+    }
+
+    public void removeTask(String id) {
+        projectMap.values().forEach(project -> project.remove(id));
+    }
+
+    public int projectCount() {
+        return projectMap.size();
     }
 }

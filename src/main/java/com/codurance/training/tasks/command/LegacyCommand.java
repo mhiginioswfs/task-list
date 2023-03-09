@@ -1,15 +1,10 @@
 package com.codurance.training.tasks.command;
 
 import com.codurance.training.tasks.data.Projects;
+import com.codurance.training.tasks.output.Outputter;
 import java.io.PrintWriter;
 
 public class LegacyCommand implements Command {
-
-    private final PrintWriter out;
-
-    public LegacyCommand(PrintWriter out) {
-        this.out = out;
-    }
 
     @Override
     public boolean appliesTo(String commandLine) {
@@ -45,6 +40,7 @@ public class LegacyCommand implements Command {
 
 
     private void help() {
+        Outputter out = Outputter.getInstance();
         // FIXME task implementations could return their own help info.
         out.println("Commands:");
         out.println("  show");
@@ -58,6 +54,7 @@ public class LegacyCommand implements Command {
     }
 
     private void error(String command) {
+        Outputter out = Outputter.getInstance();
         out.printf("I don't know what the command \"%s\" is.", command);
         out.println();
     }
