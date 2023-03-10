@@ -11,6 +11,10 @@ public class TodayCommand extends ShowCommand {
     }
 
     @Override
+    public String getHelpMessage() {
+        return "  today";
+    }
+    @Override
     protected Projects filterTasks(Projects projects) {
         return projects.refineTasks(Task::endsNow);
     }

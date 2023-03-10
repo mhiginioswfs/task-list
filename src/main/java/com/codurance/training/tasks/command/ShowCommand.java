@@ -14,6 +14,11 @@ public class ShowCommand implements Command {
         filterTasks(projects).show();
     }
 
+    @Override
+    public String getHelpMessage() {
+        return "  show";
+    }
+
     protected Projects filterTasks(Projects projects) {
         return projects;
     }

@@ -6,4 +6,6 @@ public interface Command {
     boolean appliesTo(String commandLine);
 
     void execute(String commandLine, Projects projects);
+
+    String getHelpMessage();
 }

@@ -60,6 +60,10 @@ public class AddNamedTaskCommand implements Command {
         }
     }
 
+    @Override
+    public String getHelpMessage() {
+        return "  add namedTask <project name> <task id> <task description>";
+    }
 
     private static class Command {
 

@@ -23,6 +23,11 @@ public class DeadLineCommand implements Command {
         return new CommandData(split[1], LocalDate.parse(split[2]));
     }
 
+    @Override
+    public String getHelpMessage() {
+        return "  deadline <task ID> <date>";
+    }
+
     private static class CommandData {
         private final String taskId;
         private final LocalDate deadline;

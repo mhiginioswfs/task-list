@@ -30,6 +30,10 @@ public class AddTaskCommand implements Command {
         projectTasks.add(new Task(projects.nextId(), command.taskDescription, false));
     }
 
+    @Override
+    public String getHelpMessage() {
+        return "  add task <project name> <task description>";
+    }
 
     private static class Command {
 

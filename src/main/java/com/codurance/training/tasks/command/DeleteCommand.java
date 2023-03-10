@@ -15,6 +15,11 @@ public class DeleteCommand implements Command {
         projects.removeTask(deleteCommand.id);
     }
 
+    @Override
+    public String getHelpMessage() {
+        return "  delete <task ID>";
+    }
+
     private static class Command {
 
         private String id;

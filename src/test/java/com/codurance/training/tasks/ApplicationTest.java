@@ -159,6 +159,23 @@ public final class ApplicationTest {
     }
 
     @Test
+    public void help_command_returns_help_for_all_commands() throws Exception {
+        execute("help");
+        readLines(
+                "Commands:",
+                "  deadline <task ID> <date>",
+                "  show",
+                "  today",
+                "  add task <project name> <task description>",
+                "  add namedTask <project name> <task id> <task description>",
+                "  delete <task ID>",
+                "  add project <project name>",
+                "  check <task ID>",
+                "  uncheck <task ID>");
+        execute("quit");
+    }
+
+    @Test
     public void today_command_should_show_all_tasks_due_today() throws Exception {
         execute("add project secrets");
         execute("add task secrets Eat more donuts.");
