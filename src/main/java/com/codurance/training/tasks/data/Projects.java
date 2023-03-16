@@ -1,7 +1,6 @@
 package com.codurance.training.tasks.data;
 
 import com.codurance.training.tasks.exception.ExecutionException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,20 +63,6 @@ public class Projects {
         return projectMap.get(project);
     }
 
-    public List<String> show() {
-        List<String> tasks = new ArrayList<>();
-        for (Map.Entry<String, Project> project : projectMap.entrySet()) {
-            tasks.add(project.getKey());
-            for (Task task : project.getValue().getTasks()) {
-                String format = String.format("    [%c] %s: %s", (task.isDone() ? 'x' : ' '), task.getId(),
-                        task.getDescription());
-                tasks.add(format);
-            }
-            tasks.add("");
-        }
-        return tasks;
-    }
-
     public void setDone(String taskId, boolean done) {
         findTask(taskId)
                 .orElseThrow(
@@ -91,5 +76,15 @@ public class Projects {
 
     public int projectCount() {
         return projectMap.size();
+    }
+
+    public void accept(ProjectsVisitor visitor) {
+        for (Map.Entry<String, Project> entry : projectMap.entrySet()) {
+            visitor.visitProject(entry.getKey(), entry.getValue());
+            for (Task task : entry.getValue().getTasks()) {
+                visitor.visitTask(task);
+            }
+            visitor.endVisitProject(entry.getValue());
+        }
     }
 }
