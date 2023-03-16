@@ -1,6 +1,7 @@
 package com.codurance.training.tasks.command;
 
 import com.codurance.training.tasks.data.Projects;
+import java.util.List;
 
 public class ShowCommand implements Command {
 
@@ -10,8 +11,8 @@ public class ShowCommand implements Command {
     }
 
     @Override
-    public final void execute(String commandLine, Projects projects) {
-        filterTasks(projects).show();
+    public final List<String> execute(String commandLine, Projects projects) {
+        return filterTasks(projects).show();
     }
 
     @Override

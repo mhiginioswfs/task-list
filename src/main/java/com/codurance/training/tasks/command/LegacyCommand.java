@@ -1,7 +1,9 @@
 package com.codurance.training.tasks.command;
 
 import com.codurance.training.tasks.data.Projects;
-import com.codurance.training.tasks.output.Outputter;
+import com.codurance.training.tasks.exception.ExecutionException;
+import java.util.Collections;
+import java.util.List;
 
 public class LegacyCommand implements Command {
 
@@ -11,7 +13,7 @@ public class LegacyCommand implements Command {
     }
 
     @Override
-    public void execute(String commandLine, Projects projects) {
+    public List<String> execute(String commandLine, Projects projects) {
         String[] commandRest = commandLine.split(" ", 2);
         String command = commandRest[0];
         switch (command) {
@@ -20,6 +22,7 @@ public class LegacyCommand implements Command {
             case "uncheck" -> uncheck(commandRest[1], projects);
             default -> error(command);
         }
+        return Collections.emptyList();
     }
 
     private void add(String[] commandLine, Projects projects) {
@@ -38,13 +41,11 @@ public class LegacyCommand implements Command {
     @Override
     public String getHelpMessage() {
         return "  add project <project name>\r\n" +
-               "  check <task ID>\r\n" +
-               "  uncheck <task ID>";
+                "  check <task ID>\r\n" +
+                "  uncheck <task ID>";
     }
 
     private void error(String command) {
-        Outputter out = Outputter.getInstance();
-        out.printf("I don't know what the command \"%s\" is.", command);
-        out.println();
+        throw new ExecutionException(String.format("I don't know what the command \"%s\" is.", command));
     }
 }

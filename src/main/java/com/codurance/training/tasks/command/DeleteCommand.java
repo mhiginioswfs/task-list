@@ -1,6 +1,8 @@
 package com.codurance.training.tasks.command;
 
 import com.codurance.training.tasks.data.Projects;
+import java.util.Collections;
+import java.util.List;
 
 public class DeleteCommand implements Command {
 
@@ -10,9 +12,10 @@ public class DeleteCommand implements Command {
     }
 
     @Override
-    public final void execute(String commandLine, Projects projects) {
+    public final List<String> execute(String commandLine, Projects projects) {
         Command deleteCommand = Command.parse(commandLine);
         projects.removeTask(deleteCommand.id);
+        return Collections.emptyList();
     }
 
     @Override

@@ -2,25 +2,17 @@ package com.codurance.training.tasks.output;
 
 import java.io.PrintWriter;
 
-public class Outputter {
+public class Output {
 
-    private static final Outputter INSTANCE = new Outputter(new PrintWriter(System.out));
+    private static final Output INSTANCE = new Output(new PrintWriter(System.out));
     private PrintWriter writer;
 
-    public Outputter(PrintWriter writer) {
+    public Output(PrintWriter writer) {
         this.writer = writer;
     }
 
-    public static Outputter getInstance() {
+    public static Output getInstance() {
         return INSTANCE;
-    }
-
-    public void println() {
-        writer.println();
-    }
-
-    public void printf(String format, Object... params) {
-        writer.printf(format, params);
     }
 
     public void println(String text) {

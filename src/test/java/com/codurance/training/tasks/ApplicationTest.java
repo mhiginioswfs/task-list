@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.codurance.training.tasks.output.Outputter;
+import com.codurance.training.tasks.output.Output;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,7 +36,7 @@ public final class ApplicationTest {
         taskList = new TaskList(in);
         applicationThread = new Thread(taskList);
         PrintWriter out = new PrintWriter(new PipedOutputStream(outStream), true);
-        Outputter.getInstance().setPrintWriter(out);
+        Output.getInstance().setPrintWriter(out);
     }
 
     @BeforeEach
@@ -126,6 +126,15 @@ public final class ApplicationTest {
         Thread.sleep(100);
         assertTrue(taskList.getError() instanceof NoSuchElementException);
         assertEquals("Task 3 not found", taskList.getError().getMessage());
+    }
+
+    @Test
+    void add_named_task_should_fail_if_project_doesnt_exist() throws Exception {
+        execute("add namedTask myProject task bla bla bla");
+
+        readLines("Could not find a project with the name \"myProject\".");
+
+        execute("quit");
     }
 
     @Test

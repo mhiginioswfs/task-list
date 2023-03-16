@@ -3,6 +3,8 @@ package com.codurance.training.tasks.command;
 import com.codurance.training.tasks.data.Task;
 import com.codurance.training.tasks.data.Projects;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 
 public class DeadLineCommand implements Command {
 
@@ -12,10 +14,11 @@ public class DeadLineCommand implements Command {
     }
 
     @Override
-    public void execute(String commandLine, Projects projects) {
+    public List<String> execute(String commandLine, Projects projects) {
         CommandData data = parse(commandLine);
         Task task = projects.getTaskById(data.taskId);
         task.setDeadline(data.deadline);
+        return Collections.emptyList();
     }
 
     private CommandData parse(String commandLine) {

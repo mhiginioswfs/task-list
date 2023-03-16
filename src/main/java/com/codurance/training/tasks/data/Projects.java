@@ -1,6 +1,7 @@
 package com.codurance.training.tasks.data;
 
-import com.codurance.training.tasks.output.Outputter;
+import com.codurance.training.tasks.exception.ExecutionException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,23 +64,25 @@ public class Projects {
         return projectMap.get(project);
     }
 
-    public void show() {
-        Outputter out = Outputter.getInstance();
+    public List<String> show() {
+        List<String> tasks = new ArrayList<>();
         for (Map.Entry<String, Project> project : projectMap.entrySet()) {
-            out.println(project.getKey());
+            tasks.add(project.getKey());
             for (Task task : project.getValue().getTasks()) {
-                out.printf("    [%c] %s: %s%n", (task.isDone() ? 'x' : ' '), task.getId(), task.getDescription());
+                String format = String.format("    [%c] %s: %s", (task.isDone() ? 'x' : ' '), task.getId(),
+                        task.getDescription());
+                tasks.add(format);
             }
-            out.println();
+            tasks.add("");
         }
+        return tasks;
     }
 
     public void setDone(String taskId, boolean done) {
-        findTask(taskId).ifPresentOrElse(task -> task.setDone(done), () -> {
-            Outputter out = Outputter.getInstance();
-            out.printf("Could not find a task with an ID of %s.", taskId);
-            out.println();
-        });
+        findTask(taskId)
+                .orElseThrow(
+                        () -> new ExecutionException(String.format("Could not find a task with an ID of %s.", taskId)))
+                .setDone(done);
     }
 
     public void removeTask(String id) {

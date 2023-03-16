@@ -1,9 +1,9 @@
 package com.codurance.training.tasks.command;
 
-import com.codurance.training.tasks.data.Task;
 import com.codurance.training.tasks.data.Projects;
-import com.codurance.training.tasks.output.Outputter;
-import java.io.PrintWriter;
+import com.codurance.training.tasks.data.Task;
+import com.codurance.training.tasks.exception.ExecutionException;
+import java.util.Collections;
 import java.util.List;
 
 public class AddTaskCommand implements Command {
@@ -14,18 +14,16 @@ public class AddTaskCommand implements Command {
     }
 
     @Override
-    public void execute(String commandLine, Projects projects) {
+    public List<String> execute(String commandLine, Projects projects) {
         addTask(Command.parse(commandLine), projects);
+        return Collections.emptyList();
     }
 
     private void addTask(Command command, Projects projects) {
         List<Task> projectTasks = projects.getProject(command.projectName).getTasks();
         if (projectTasks == null) {
-
-            Outputter out = Outputter.getInstance();
-            out.printf("Could not find a project with the name \"%s\".", command.projectName);
-            out.println();
-            return;
+            throw new ExecutionException(
+                    String.format("Could not find a project with the name \"%s\".", command.projectName));
         }
         projectTasks.add(new Task(projects.nextId(), command.taskDescription, false));
     }

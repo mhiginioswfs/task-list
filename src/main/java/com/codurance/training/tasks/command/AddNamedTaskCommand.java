@@ -3,8 +3,8 @@ package com.codurance.training.tasks.command;
 import com.codurance.training.tasks.data.Project;
 import com.codurance.training.tasks.data.Projects;
 import com.codurance.training.tasks.data.Task;
-import com.codurance.training.tasks.output.Outputter;
-import java.io.PrintWriter;
+import com.codurance.training.tasks.exception.ExecutionException;
+import java.util.Collections;
 import java.util.List;
 
 public class AddNamedTaskCommand implements Command {
@@ -15,27 +15,23 @@ public class AddNamedTaskCommand implements Command {
     }
 
     @Override
-    public void execute(String commandLine, Projects projects) {
+    public List<String> execute(String commandLine, Projects projects) {
         Command command = Command.parse(commandLine);
         add(command, projects);
+        return Collections.emptyList();
     }
 
     private void add(Command command, Projects projects) {
         Project project = projects.getProject(command.projectName);
-        Outputter out = Outputter.getInstance();
         if (project == null) {
-            out.printf("Could not find a project with the name \"%s\".", command.projectName);
-            out.println();
-            return;
+            String error = String.format("Could not find a project with the name \"%s\".", command.projectName);
+            throw new ExecutionException(error);
         }
         if (isInvalidId(command.taskId)) {
-            out.printf("Task name can't be a number or contain special characters.");
-            out.println();
-            return;
+            throw new ExecutionException("Task name can't be a number or contain special characters.");
         }
         List<Task> projectTasks = project.getTasks();
         addTaskToProjectTasks(command, projects, projectTasks);
-
     }
 
     private static boolean isInvalidId(String taskId) {
@@ -54,9 +50,7 @@ public class AddNamedTaskCommand implements Command {
         if (!projects.existTask(command.taskId)) {
             projectTasks.add(new Task(command.taskId, command.taskDescription, false));
         } else {
-            Outputter out = Outputter.getInstance();
-            out.printf("Task \"%s\" already exists.", command.taskId);
-            out.println();
+            throw new ExecutionException(String.format("Task \"%s\" already exists.", command.taskId));
         }
     }
 
