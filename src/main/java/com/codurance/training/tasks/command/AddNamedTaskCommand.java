@@ -1,17 +1,13 @@
 package com.codurance.training.tasks.command;
 
+import com.codurance.training.tasks.data.Project;
+import com.codurance.training.tasks.data.Projects;
 import com.codurance.training.tasks.data.Task;
-import com.codurance.training.tasks.data.Tasks;
+import com.codurance.training.tasks.output.Outputter;
 import java.io.PrintWriter;
 import java.util.List;
 
 public class AddNamedTaskCommand implements Command {
-
-    private final PrintWriter out;
-
-    public AddNamedTaskCommand(PrintWriter out) {
-        this.out = out;
-    }
 
     @Override
     public boolean appliesTo(String commandLine) {
@@ -19,14 +15,15 @@ public class AddNamedTaskCommand implements Command {
     }
 
     @Override
-    public void execute(String commandLine, Tasks tasks) {
+    public void execute(String commandLine, Projects projects) {
         Command command = Command.parse(commandLine);
-        add(command, tasks);
+        add(command, projects);
     }
 
-    private void add(Command command, Tasks tasks) {
-        List<Task> projectTasks = tasks.getProject(command.projectName);
-        if (projectTasks == null) {
+    private void add(Command command, Projects projects) {
+        Project project = projects.getProject(command.projectName);
+        Outputter out = Outputter.getInstance();
+        if (project == null) {
             out.printf("Could not find a project with the name \"%s\".", command.projectName);
             out.println();
             return;
@@ -36,7 +33,8 @@ public class AddNamedTaskCommand implements Command {
             out.println();
             return;
         }
-        addTaskToProjectTasks(command, tasks, projectTasks);
+        List<Task> projectTasks = project.getTasks();
+        addTaskToProjectTasks(command, projects, projectTasks);
 
     }
 
@@ -52,15 +50,20 @@ public class AddNamedTaskCommand implements Command {
         return taskId.chars().filter(k -> !Character.isDigit(k)).findFirst().isEmpty();
     }
 
-    private void addTaskToProjectTasks(Command command, Tasks tasks, List<Task> projectTasks) {
-        if (!tasks.existTask(command.taskId)) {
+    private void addTaskToProjectTasks(Command command, Projects projects, List<Task> projectTasks) {
+        if (!projects.existTask(command.taskId)) {
             projectTasks.add(new Task(command.taskId, command.taskDescription, false));
         } else {
+            Outputter out = Outputter.getInstance();
             out.printf("Task \"%s\" already exists.", command.taskId);
             out.println();
         }
     }
 
+    @Override
+    public String getHelpMessage() {
+        return "  add namedTask <project name> <task id> <task description>";
+    }
 
     private static class Command {
 

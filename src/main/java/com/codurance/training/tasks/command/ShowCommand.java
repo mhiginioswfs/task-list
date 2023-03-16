@@ -1,11 +1,6 @@
 package com.codurance.training.tasks.command;
 
-import com.codurance.training.tasks.data.Task;
-import com.codurance.training.tasks.TaskList;
-import com.codurance.training.tasks.data.Tasks;
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Map;
+import com.codurance.training.tasks.data.Projects;
 
 public class ShowCommand implements Command {
 
@@ -15,12 +10,17 @@ public class ShowCommand implements Command {
     }
 
     @Override
-    public final void execute(String commandLine, Tasks tasks) {
-        filterTasks(tasks).show();
+    public final void execute(String commandLine, Projects projects) {
+        filterTasks(projects).show();
     }
 
-    protected Tasks filterTasks(Tasks tasks) {
-        return tasks;
+    @Override
+    public String getHelpMessage() {
+        return "  show";
+    }
+
+    protected Projects filterTasks(Projects projects) {
+        return projects;
     }
 
 }

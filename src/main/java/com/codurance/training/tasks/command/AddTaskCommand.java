@@ -1,17 +1,12 @@
 package com.codurance.training.tasks.command;
 
 import com.codurance.training.tasks.data.Task;
-import com.codurance.training.tasks.data.Tasks;
+import com.codurance.training.tasks.data.Projects;
+import com.codurance.training.tasks.output.Outputter;
 import java.io.PrintWriter;
 import java.util.List;
 
 public class AddTaskCommand implements Command {
-
-    private final PrintWriter out;
-
-    public AddTaskCommand(PrintWriter out) {
-        this.out = out;
-    }
 
     @Override
     public boolean appliesTo(String commandLine) {
@@ -19,20 +14,26 @@ public class AddTaskCommand implements Command {
     }
 
     @Override
-    public void execute(String commandLine, Tasks tasks) {
-        addTask(Command.parse(commandLine), tasks);
+    public void execute(String commandLine, Projects projects) {
+        addTask(Command.parse(commandLine), projects);
     }
 
-    private void addTask(Command command, Tasks tasks) {
-        List<Task> projectTasks = tasks.getProject(command.projectName);
+    private void addTask(Command command, Projects projects) {
+        List<Task> projectTasks = projects.getProject(command.projectName).getTasks();
         if (projectTasks == null) {
+
+            Outputter out = Outputter.getInstance();
             out.printf("Could not find a project with the name \"%s\".", command.projectName);
             out.println();
             return;
         }
-        projectTasks.add(new Task(tasks.nextId(), command.taskDescription, false));
+        projectTasks.add(new Task(projects.nextId(), command.taskDescription, false));
     }
 
+    @Override
+    public String getHelpMessage() {
+        return "  add task <project name> <task description>";
+    }
 
     private static class Command {
 

@@ -1,45 +1,33 @@
 package com.codurance.training.tasks;
 
-import com.codurance.training.tasks.command.AddNamedTaskCommand;
-import com.codurance.training.tasks.command.AddTaskCommand;
 import com.codurance.training.tasks.command.Command;
-import com.codurance.training.tasks.command.DeadLineCommand;
-import com.codurance.training.tasks.command.LegacyCommand;
-import com.codurance.training.tasks.command.ShowCommand;
-import com.codurance.training.tasks.command.TodayCommand;
-import com.codurance.training.tasks.data.Tasks;
+import com.codurance.training.tasks.command.CommandRegistry;
+import com.codurance.training.tasks.data.Projects;
+import com.codurance.training.tasks.output.Outputter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.List;
 import java.util.Optional;
 
 public final class TaskList implements Runnable {
-    private static final String QUIT = "quit";
-    private final List<Command> commands;
 
-    private final Tasks tasks;
+    private static final String QUIT = "quit";
+
+
+    private final Projects projects;
     private final BufferedReader in;
-    private final PrintWriter out;
 
     private Exception error;
 
 
-    public TaskList(BufferedReader reader, PrintWriter writer) {
+    public TaskList(BufferedReader reader) {
         this.in = reader;
-        this.out = writer;
-        commands = List.of(new DeadLineCommand(),
-                new ShowCommand(),
-                new TodayCommand(),
-                new AddTaskCommand(out),
-                new AddNamedTaskCommand(out),
-                new LegacyCommand(out));
-        tasks = new Tasks(out);
+        projects = new Projects();
     }
 
     public void run() {
         try {
+            Outputter out = Outputter.getInstance();
             while (true) {
                 out.print("> ");
                 out.flush();
@@ -62,16 +50,20 @@ public final class TaskList implements Runnable {
 
     private void execute(String commandLine) {
         Command command = findCommand(commandLine);
-        command.execute(commandLine, tasks);
+        command.execute(commandLine, projects);
     }
 
     private Command findCommand(String commandLine) {
-        Optional<Command> result = commands.stream().filter((Command command) -> command.appliesTo(commandLine)).findFirst();
+        Optional<Command> result = CommandRegistry.getInstance()
+                .getCommands()
+                .stream()
+                .filter((Command command) -> command.appliesTo(commandLine))
+                .findFirst();
         return result.orElseThrow();
     }
 
-    public Tasks getTasks() {
-        return tasks;
+    public Projects getTasks() {
+        return projects;
     }
 
     public Exception getError() {
@@ -80,8 +72,7 @@ public final class TaskList implements Runnable {
 
     public static void main(String[] args) {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        PrintWriter out = new PrintWriter(System.out);
-        new TaskList(in, out).run();
+        new TaskList(in).run();
     }
 
 }
