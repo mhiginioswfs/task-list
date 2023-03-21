@@ -1,4 +1,4 @@
-package com.codurance.training.tasks;
+package com.codurance.training.tasks.command;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,10 +25,10 @@ public class HelpCommandTest {
                 "  show",
                 "  today",
                 "  add task <project name> <task description>",
+                "  add project <project name>",
                 "  add namedTask <project name> <task id> <task description>",
                 "  delete <task ID>",
-                "  add project <project name>\r\n" +
-                        "  check <task ID>\r\n" +
+                "  check <task ID>\r\n" +
                         "  uncheck <task ID>");
 
         assertEquals(expected, helpResult);

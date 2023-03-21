@@ -176,9 +176,9 @@ public final class ApplicationTest {
                 "  show",
                 "  today",
                 "  add task <project name> <task description>",
+                "  add project <project name>",
                 "  add namedTask <project name> <task id> <task description>",
                 "  delete <task ID>",
-                "  add project <project name>",
                 "  check <task ID>",
                 "  uncheck <task ID>");
         execute("quit");

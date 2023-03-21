@@ -1,4 +1,4 @@
-package com.codurance.training.tasks;
+package com.codurance.training.tasks.command;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
