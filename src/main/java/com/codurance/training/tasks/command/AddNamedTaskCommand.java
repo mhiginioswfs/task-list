@@ -28,23 +28,8 @@ public class AddNamedTaskCommand implements Command {
             String error = String.format("Could not find a project with the name \"%s\".", message.getProjectName());
             throw new ExecutionException(error);
         }
-        if (isInvalidId(message.getTaskId())) {
-            throw new ExecutionException("Task name can't be a number or contain special characters.");
-        }
         List<Task> projectTasks = project.getTasks();
         addTaskToProjectTasks(message, projects, projectTasks);
-    }
-
-    private static boolean isInvalidId(String taskId) {
-        return isNumeric(taskId) || !isAlphanumeric(taskId);
-    }
-
-    private static boolean isAlphanumeric(String taskId) {
-        return taskId.chars().filter(k -> !(Character.isAlphabetic(k) || Character.isDigit(k))).findFirst().isEmpty();
-    }
-
-    private static boolean isNumeric(String taskId) {
-        return taskId.chars().filter(k -> !Character.isDigit(k)).findFirst().isEmpty();
     }
 
     private void addTaskToProjectTasks(AddNamedTaskMessage message, Projects projects, List<Task> projectTasks) {

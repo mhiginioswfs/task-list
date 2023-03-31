@@ -87,4 +87,16 @@ public class AddNamedTaskCommandTest {
         assertEquals(0, projects.getProject("myProject").getTasks().size());
         assertEquals("Task name can't be a number or contain special characters.", exception.getMessage());
     }
+
+    @Test
+    void add_named_task_command_should_throw_an_error_with_less_than_5_parameters() {
+        AddNamedTaskCommand task = new AddNamedTaskCommand();
+        Projects projects = new Projects();
+        projects.addProject("myProject");
+        ExecutionException exception = assertThrows(ExecutionException.class,
+                () -> task.execute("add namedTask myProject a", projects));
+
+        assertEquals(0, projects.getProject("myProject").getTasks().size());
+        assertEquals("5 parameters needed. Command: add namedTask myProject a", exception.getMessage());
+    }
 }
