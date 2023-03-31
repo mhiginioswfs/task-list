@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.codurance.training.tasks.output.Outputter;
+import com.codurance.training.tasks.output.Output;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,7 +36,7 @@ public final class ApplicationTest {
         taskList = new TaskList(in);
         applicationThread = new Thread(taskList);
         PrintWriter out = new PrintWriter(new PipedOutputStream(outStream), true);
-        Outputter.getInstance().setPrintWriter(out);
+        Output.getInstance().setPrintWriter(out);
     }
 
     @BeforeEach
@@ -129,6 +129,15 @@ public final class ApplicationTest {
     }
 
     @Test
+    void add_named_task_should_fail_if_project_doesnt_exist() throws Exception {
+        execute("add namedTask myProject task bla bla bla");
+
+        readLines("Could not find a project with the name \"myProject\".");
+
+        execute("quit");
+    }
+
+    @Test
     public void delete_task_should_remove_the_task() throws Exception {
         execute("add project secrets");
         execute("add task secrets Eat more donuts.");
@@ -167,9 +176,9 @@ public final class ApplicationTest {
                 "  show",
                 "  today",
                 "  add task <project name> <task description>",
+                "  add project <project name>",
                 "  add namedTask <project name> <task id> <task description>",
                 "  delete <task ID>",
-                "  add project <project name>",
                 "  check <task ID>",
                 "  uncheck <task ID>");
         execute("quit");

@@ -1,6 +1,9 @@
 package com.codurance.training.tasks.command;
 
+import com.codurance.training.tasks.command.message.DeleteMessage;
 import com.codurance.training.tasks.data.Projects;
+import java.util.Collections;
+import java.util.List;
 
 public class DeleteCommand implements Command {
 
@@ -10,27 +13,14 @@ public class DeleteCommand implements Command {
     }
 
     @Override
-    public final void execute(String commandLine, Projects projects) {
-        Command deleteCommand = Command.parse(commandLine);
-        projects.removeTask(deleteCommand.id);
+    public final List<String> execute(String commandLine, Projects projects) {
+        DeleteMessage message = new DeleteMessage().parse(commandLine);
+        projects.removeTask(message.getTaskId());
+        return Collections.emptyList();
     }
 
     @Override
     public String getHelpMessage() {
         return "  delete <task ID>";
-    }
-
-    private static class Command {
-
-        private String id;
-
-        private Command(String id) {
-            this.id = id;
-        }
-
-        public static Command parse(String command) {
-            String[] commandSplit = command.split(" ", 2);
-            return new Command(commandSplit[1]);
-        }
     }
 }

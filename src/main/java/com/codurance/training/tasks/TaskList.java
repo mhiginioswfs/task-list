@@ -3,10 +3,12 @@ package com.codurance.training.tasks;
 import com.codurance.training.tasks.command.Command;
 import com.codurance.training.tasks.command.CommandRegistry;
 import com.codurance.training.tasks.data.Projects;
-import com.codurance.training.tasks.output.Outputter;
+import com.codurance.training.tasks.exception.ExecutionException;
+import com.codurance.training.tasks.output.Output;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Optional;
 
 public final class TaskList implements Runnable {
@@ -27,7 +29,7 @@ public final class TaskList implements Runnable {
 
     public void run() {
         try {
-            Outputter out = Outputter.getInstance();
+            Output out = Output.getInstance();
             while (true) {
                 out.print("> ");
                 out.flush();
@@ -50,7 +52,13 @@ public final class TaskList implements Runnable {
 
     private void execute(String commandLine) {
         Command command = findCommand(commandLine);
-        command.execute(commandLine, projects);
+        Output out = Output.getInstance();
+        try {
+            List<String> execute = command.execute(commandLine, projects);
+            execute.forEach(out::println);
+        } catch (ExecutionException e) {
+            out.println(e.getMessage());
+        }
     }
 
     private Command findCommand(String commandLine) {

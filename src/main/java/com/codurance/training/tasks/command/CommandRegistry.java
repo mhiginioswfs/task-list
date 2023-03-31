@@ -12,10 +12,11 @@ public class CommandRegistry {
                 new ShowCommand(),
                 new TodayCommand(),
                 new AddTaskCommand(),
+                new AddProjectCommand(),
                 new AddNamedTaskCommand(),
                 new DeleteCommand(),
                 new HelpCommand(),
-                new LegacyCommand());
+                new CheckCommand());
     }
 
     public List<Command> getCommands() {

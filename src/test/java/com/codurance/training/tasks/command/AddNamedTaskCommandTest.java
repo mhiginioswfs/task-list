@@ -1,43 +1,31 @@
-package com.codurance.training.tasks;
+package com.codurance.training.tasks.command;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.codurance.training.tasks.command.AddNamedTaskCommand;
 import com.codurance.training.tasks.data.Projects;
 import com.codurance.training.tasks.data.Task;
-import com.codurance.training.tasks.output.Outputter;
-import java.io.PrintWriter;
+import com.codurance.training.tasks.exception.ExecutionException;
 import java.util.List;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class AddNamedTaskCommandTest {
 
-    @Mock
-    private PrintWriter out;
-
-    @BeforeEach
-    public void initOutputter() {
-        Outputter.getInstance().setPrintWriter(out);
-    }
-
     @Test
     void add_named_task_should_fail_if_project_doesnt_exist() {
         AddNamedTaskCommand task = new AddNamedTaskCommand();
         Projects projects = new Projects();
-        task.execute("add namedTask myProject task bla bla bla", projects);
+        ExecutionException exception = assertThrows(ExecutionException.class,
+                () -> task.execute("add namedTask myProject task bla bla bla", projects));
 
-        verify(out).printf("Could not find a project with the name \"%s\".", "myProject");
-        verify(out).println();
+        assertEquals("Could not find a project with the name \"myProject\".", exception.getMessage());
 
         assertNull(projects.getProject("myProject"));
     }
@@ -63,7 +51,8 @@ public class AddNamedTaskCommandTest {
         projects.addProject("myProject");
         task.execute("add namedTask myProject myTask bla bla bla", projects);
 
-        task.execute("add namedTask myProject myTask Add my task again", projects);
+        ExecutionException exception = assertThrows(ExecutionException.class,
+                () -> task.execute("add namedTask myProject myTask Add my task again", projects));
 
         List<Task> projectTasks = projects.getProject("myProject").getTasks();
         assertNotNull(projectTasks);
@@ -71,8 +60,7 @@ public class AddNamedTaskCommandTest {
         assertEquals("bla bla bla", projectTasks.get(0).getDescription());
         assertEquals("myTask", projectTasks.get(0).getId());
 
-        verify(out).printf("Task \"%s\" already exists.", "myTask");
-        verify(out).println();
+        assertEquals("Task \"myTask\" already exists.", exception.getMessage());
     }
 
     @Test
@@ -80,12 +68,12 @@ public class AddNamedTaskCommandTest {
         AddNamedTaskCommand task = new AddNamedTaskCommand();
         Projects projects = new Projects();
         projects.addProject("myProject");
-        task.execute("add namedTask myProject 123 bla bla bla", projects);
+        ExecutionException exception = assertThrows(ExecutionException.class,
+                () -> task.execute("add namedTask myProject 123 bla bla bla", projects));
 
         assertEquals(0, projects.getProject("myProject").getTasks().size());
 
-        verify(out).printf("Task name can't be a number or contain special characters.");
-        verify(out).println();
+        assertEquals("Task name can't be a number or contain special characters.", exception.getMessage());
     }
 
     @Test
@@ -93,11 +81,22 @@ public class AddNamedTaskCommandTest {
         AddNamedTaskCommand task = new AddNamedTaskCommand();
         Projects projects = new Projects();
         projects.addProject("myProject");
-        task.execute("add namedTask myProject a.a bla bla bla", projects);
+        ExecutionException exception = assertThrows(ExecutionException.class,
+                () -> task.execute("add namedTask myProject a.a bla bla bla", projects));
 
         assertEquals(0, projects.getProject("myProject").getTasks().size());
+        assertEquals("Task name can't be a number or contain special characters.", exception.getMessage());
+    }
 
-        verify(out).printf("Task name can't be a number or contain special characters.");
-        verify(out).println();
+    @Test
+    void add_named_task_command_should_throw_an_error_with_less_than_5_parameters() {
+        AddNamedTaskCommand task = new AddNamedTaskCommand();
+        Projects projects = new Projects();
+        projects.addProject("myProject");
+        ExecutionException exception = assertThrows(ExecutionException.class,
+                () -> task.execute("add namedTask myProject a", projects));
+
+        assertEquals(0, projects.getProject("myProject").getTasks().size());
+        assertEquals("5 parameters needed. Command: add namedTask myProject a", exception.getMessage());
     }
 }

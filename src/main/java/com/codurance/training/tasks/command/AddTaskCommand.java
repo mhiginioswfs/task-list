@@ -1,9 +1,11 @@
 package com.codurance.training.tasks.command;
 
-import com.codurance.training.tasks.data.Task;
+import com.codurance.training.tasks.command.message.AddTaskMessage;
+import com.codurance.training.tasks.data.Project;
 import com.codurance.training.tasks.data.Projects;
-import com.codurance.training.tasks.output.Outputter;
-import java.io.PrintWriter;
+import com.codurance.training.tasks.data.Task;
+import com.codurance.training.tasks.exception.ExecutionException;
+import java.util.Collections;
 import java.util.List;
 
 public class AddTaskCommand implements Command {
@@ -14,38 +16,23 @@ public class AddTaskCommand implements Command {
     }
 
     @Override
-    public void execute(String commandLine, Projects projects) {
-        addTask(Command.parse(commandLine), projects);
+    public List<String> execute(String commandLine, Projects projects) {
+        addTask(new AddTaskMessage().parse(commandLine), projects);
+        return Collections.emptyList();
     }
 
-    private void addTask(Command command, Projects projects) {
-        List<Task> projectTasks = projects.getProject(command.projectName).getTasks();
-        if (projectTasks == null) {
-
-            Outputter out = Outputter.getInstance();
-            out.printf("Could not find a project with the name \"%s\".", command.projectName);
-            out.println();
-            return;
+    private void addTask(AddTaskMessage message, Projects projects) {
+        Project project = projects.getProject(message.getProjectName());
+        if (project == null) {
+            throw new ExecutionException(
+                    String.format("Could not find a project with the name \"%s\".", message.getProjectName()));
         }
-        projectTasks.add(new Task(projects.nextId(), command.taskDescription, false));
+        List<Task> projectTasks = project.getTasks();
+        projectTasks.add(new Task(projects.nextId(), message.getTaskDescription(), false));
     }
 
     @Override
     public String getHelpMessage() {
         return "  add task <project name> <task description>";
-    }
-
-    private static class Command {
-
-        private String projectName;
-        private String taskDescription;
-
-        public static Command parse(String command) {
-            String[] commandSplit = command.split(" ", 4);
-            Command result = new Command();
-            result.projectName = commandSplit[2];
-            result.taskDescription = commandSplit[3];
-            return result;
-        }
     }
 }

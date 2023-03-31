@@ -1,6 +1,6 @@
 package com.codurance.training.tasks.data;
 
-import com.codurance.training.tasks.output.Outputter;
+import com.codurance.training.tasks.exception.ExecutionException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,23 +63,11 @@ public class Projects {
         return projectMap.get(project);
     }
 
-    public void show() {
-        Outputter out = Outputter.getInstance();
-        for (Map.Entry<String, Project> project : projectMap.entrySet()) {
-            out.println(project.getKey());
-            for (Task task : project.getValue().getTasks()) {
-                out.printf("    [%c] %s: %s%n", (task.isDone() ? 'x' : ' '), task.getId(), task.getDescription());
-            }
-            out.println();
-        }
-    }
-
     public void setDone(String taskId, boolean done) {
-        findTask(taskId).ifPresentOrElse(task -> task.setDone(done), () -> {
-            Outputter out = Outputter.getInstance();
-            out.printf("Could not find a task with an ID of %s.", taskId);
-            out.println();
-        });
+        findTask(taskId)
+                .orElseThrow(
+                        () -> new ExecutionException(String.format("Could not find a task with an ID of %s.", taskId)))
+                .setDone(done);
     }
 
     public void removeTask(String id) {
@@ -88,5 +76,15 @@ public class Projects {
 
     public int projectCount() {
         return projectMap.size();
+    }
+
+    public void accept(ProjectsVisitor visitor) {
+        for (Map.Entry<String, Project> entry : projectMap.entrySet()) {
+            visitor.visitProject(entry.getKey(), entry.getValue());
+            for (Task task : entry.getValue().getTasks()) {
+                visitor.visitTask(task);
+            }
+            visitor.endVisitProject(entry.getValue());
+        }
     }
 }
